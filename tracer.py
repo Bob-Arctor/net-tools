@@ -37,7 +37,9 @@ def make_google_marker(i, ip, check=False):
     if check and not (float(lat)) and not (float(lon)):
         my_ip = requests.get(MY_IP_URL).content.decode("UTF-8")
         lat, lon = get_lat_lon(my_ip)
-    return "&markers=color:blue%%7Clabel:%d%%7C%.6f,%.6f" % (i, float(lat), float(lon))
+    #returns markers and paths
+    return "&markers=color:blue%%7Clabel:%d%%7C%.6f,%.6f" % (i, float(lat), float(lon)), \
+           "%%7C%.6f,%.6f" % (float(lat), float(lon))
 
 
 def main():
@@ -50,16 +52,19 @@ def main():
     r1, unans = traceroute(host, maxttl=20, verbose=0)
     hops = list(r1.get_trace().values())[0]
 
-    params = "size=1000x1000&maptype=roadmap"
+    params = "size=1000x1000&scale=2&maptype=terrain"
     markers = ""
+    paths = "&path=weight:5%%7Ccolor:0x0000ff"
 
     for k in hops.keys():
         print("%d -> %s (%s)" % (k, get_geolocation_for_ip(hops[k][0]), hops[k][0]))
-        markers += make_google_marker(k, hops[k][0], True)
+        m, p = make_google_marker(k, hops[k][0], True)
+        markers += m
+        paths += p
 
     print("-"*50)
     print("Click link below to see the stops:")
-    print("%s%s%s&key=%s" % (GOOGLE_START_URL, params, markers, GOOGLE_API_KEY))
+    print("%s%s%s%s&key=%s" % (GOOGLE_START_URL, params, markers, paths, GOOGLE_API_KEY))
 
     #commented out due to error in OS
     #webbrowser.open_new_tab("%s%s%s&key=%s" % (GOOGLE_START_URL, params, markers, GOOGLE_API_KEY))

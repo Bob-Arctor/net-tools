@@ -63,7 +63,7 @@ def main():
         paths += p
 
     print("-"*50)
-    print("Click link below to see the stops:")
+    print("Click the link below to see the trace:")
     print("%s%s%s%s&key=%s" % (GOOGLE_START_URL, params, markers, paths, GOOGLE_API_KEY))
 
     #commented out due to error in OS

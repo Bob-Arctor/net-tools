@@ -7,22 +7,28 @@ import webbrowser
 if len(sys.argv) != 2:
     sys.exit('Usage: traceroute.py <remote host>')
 
-FREEGEOPIP_URL = 'http://freegeoip.net/json/'
+FREEGEOPIP_URL = 'http://freegeoip.net/json'
 MY_IP_URL = 'http://ip.42.pl/raw'
 GOOGLE_API_KEY = 'AIzaSyAsg1SGMa85Aa8Ai0gb2VzLdRWMiNj76ms'
 GOOGLE_START_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
 
+
 def get_lat_lon(ip):
     url = '{}/{}'.format(FREEGEOPIP_URL, ip)
     response = requests.get(url)
-    response.raise_for_status()
-    lat = str(response.json()["latitude"])
-    lon = str(response.json()["longitude"])
+    if response.status_code == 404:
+        lat = 0
+        lon = 0
+        print('got 404')
+    else:
+        lat = str(response.json()["latitude"])
+        lon = str(response.json()["longitude"])
     return lat, lon
 
 
 def get_geolocation_for_ip(ip):
     lat, lon = get_lat_lon(ip)
+    print(lat)
     if not (float(lat)) and not (float(lon)):
         my_ip = requests.get(MY_IP_URL).content.decode("UTF-8")
         lat, lon = get_lat_lon(my_ip)
